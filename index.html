@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>valg.dk – prototype</title>
+<meta name="description" content="Prototype til bachelorprojekt om informationsarkitektur på Valg.dk. Eksempeldata – ikke den officielle Valg.dk.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Spring til indhold</a>
+<div class="proto-banner" role="note">Prototype til bachelorprojekt – ikke den officielle Valg.dk. Alle tal er eksempeldata.</div>
+<header class="site-header">
+  <div class="in">
+    <a class="logo" href="#/" aria-label="valg.dk – forside">valg.dk<small>PROTOTYPE</small></a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Hovedmenu">
+      <a href="#/find" data-nav="find">Valgresultater</a>
+      <a href="#/om-valg" data-nav="om-valg">Om valg</a>
+      <a href="#/sammenlign" data-nav="sammenlign">Tal og data</a>
+      <a href="#/vejledning" data-nav="vejledning">Hjælp</a>
+    </nav>
+    <div class="header-right"><a href="#/ikke-med?side=English">English</a></div>
+  </div>
+</header>
+<main id="main" tabindex="-1"></main>
+<footer class="site-footer">
+  <div class="in">
+    <a class="logo" href="#/">valg.dk</a>
+    <small>Prototype til bachelorprojekt (Zealand, PBA Digital Konceptudvikling) i samarbejde med KOMBIT – ikke den officielle Valg.dk. Alle tal er eksempeldata.</small>
+    <small><a href="#/om-valg">Om valg</a> · <a href="#/sammenlign">Tal og data</a> · <a href="#/vejledning">Hjælp</a> · <a href="#/ikke-med?side=Tilgængelighed">Tilgængelighed</a></small>
+  </div>
+</footer>
+<noscript><p style="padding:24px">Prototypen kræver JavaScript.</p></noscript>
+<script src="js/data.js"></script>
+<script src="js/test-mode.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
