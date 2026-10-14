@@ -1,7 +1,7 @@
 /* Valg.dk – prototype (bachelorprojekt). Eksempeldata. */
 :root{
   --bg:#F5F8FB; --white:#fff; --ink:#0F1C2E; --muted:#5B6877; --line:#D5DDE6;
-  --primary:#3F5061; --primary-dark:#093D94; --nav:#3F5061; --tint:#E6F2E8; --green:#1E8A4C;
+  --primary:#0B4FBF; --primary-dark:#093D94; --nav:#3F5061; --tint:#E6F2E8; --green:#1E8A4C;
   --soft:#E1EBF5; --warn:#FFF4D6; --orange:#E6732F; --teal:#12998F; --danger:#B3261E;
   --radius:12px; --shadow:0 1px 2px rgba(15,28,46,.06),0 4px 14px rgba(15,28,46,.05);
   --font:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
