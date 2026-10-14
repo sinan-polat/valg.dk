@@ -65,6 +65,16 @@ SMALL = {"Fanø": 11, "Samsø": 11, "Ærø": 11, "Læsø": 11}
 OFFICIAL_NAMES = {"Aabenraa": "Aabenraa", "Aalborg": "Aalborg", "Aarhus": "Aarhus"}
 
 
+# Omtrentlige midtpunkter (breddegrad, længdegrad) – kun til det skematiske kort
+COORDS = {
+ "Albertslund":(55.66,12.35),"Allerød":(55.87,12.35),"Ballerup":(55.73,12.36),"Bornholm":(55.13,14.9),"Brøndby":(55.65,12.42),"Dragør":(55.59,12.67),"Egedal":(55.78,12.2),"Fredensborg":(55.98,12.4),"Frederiksberg":(55.68,12.53),"Frederikssund":(55.84,12.07),"Furesø":(55.8,12.38),"Gentofte":(55.75,12.55),"Gladsaxe":(55.75,12.48),"Glostrup":(55.67,12.4),"Gribskov":(56.03,12.25),"Halsnæs":(55.95,11.9),"Helsingør":(56.03,12.55),"Herlev":(55.72,12.43),"Hillerød":(55.93,12.3),"Hvidovre":(55.64,12.47),"Høje-Taastrup":(55.65,12.27),"Hørsholm":(55.88,12.5),"Ishøj":(55.61,12.35),"København":(55.68,12.58),"Lyngby-Taarbæk":(55.78,12.5),"Rudersdal":(55.84,12.45),"Rødovre":(55.69,12.45),"Tårnby":(55.62,12.6),"Vallensbæk":(55.63,12.37),
+ "Faxe":(55.25,12.1),"Greve":(55.58,12.3),"Guldborgsund":(54.85,11.85),"Holbæk":(55.72,11.72),"Kalundborg":(55.68,11.1),"Køge":(55.46,12.18),"Lejre":(55.6,11.97),"Lolland":(54.8,11.35),"Næstved":(55.23,11.76),"Odsherred":(55.85,11.6),"Ringsted":(55.44,11.79),"Roskilde":(55.64,12.08),"Slagelse":(55.4,11.35),"Solrød":(55.53,12.22),"Sorø":(55.43,11.57),"Stevns":(55.35,12.37),"Vordingborg":(55.0,12.0),
+ "Assens":(55.27,9.9),"Billund":(55.73,9.12),"Esbjerg":(55.47,8.45),"Fanø":(55.42,8.4),"Fredericia":(55.57,9.75),"Faaborg-Midtfyn":(55.2,10.2),"Haderslev":(55.25,9.5),"Kerteminde":(55.45,10.65),"Kolding":(55.5,9.45),"Langeland":(54.9,10.8),"Middelfart":(55.5,9.75),"Nordfyns":(55.5,10.2),"Nyborg":(55.31,10.8),"Odense":(55.4,10.38),"Svendborg":(55.06,10.6),"Sønderborg":(54.95,9.8),"Tønder":(54.95,8.9),"Varde":(55.62,8.48),"Vejen":(55.48,9.15),"Vejle":(55.7,9.55),"Ærø":(54.88,10.4),"Aabenraa":(55.05,9.4),
+ "Favrskov":(56.35,10.1),"Hedensted":(55.77,9.7),"Herning":(56.13,8.97),"Holstebro":(56.36,8.62),"Horsens":(55.86,9.85),"Ikast-Brande":(55.98,9.17),"Lemvig":(56.55,8.3),"Norddjurs":(56.43,10.7),"Odder":(55.97,10.15),"Randers":(56.46,10.04),"Ringkøbing-Skjern":(55.95,8.4),"Samsø":(55.85,10.6),"Silkeborg":(56.17,9.55),"Skanderborg":(56.0,9.9),"Skive":(56.57,9.03),"Struer":(56.49,8.6),"Syddjurs":(56.27,10.55),"Viborg":(56.45,9.4),"Aarhus":(56.16,10.2),
+ "Brønderslev":(57.27,9.94),"Frederikshavn":(57.45,10.4),"Hjørring":(57.45,10.0),"Jammerbugt":(57.2,9.4),"Læsø":(57.25,11.0),"Mariagerfjord":(56.65,9.95),"Morsø":(56.8,8.8),"Rebild":(56.8,9.7),"Thisted":(56.95,8.7),"Vesthimmerland":(56.85,9.4),"Aalborg":(57.05,9.95),
+}
+
+
 def rng(*parts):
     h = hashlib.md5("|".join(parts).encode()).hexdigest()
     return random.Random(int(h[:12], 16))
@@ -131,7 +141,7 @@ def main():
             for valg in ("kv2025", "kv2021"):
                 fixed = FIXED.get(n, {}).get(valg)
                 results[valg] = make_result(n, valg, seats, round(electorate * (1.0 if valg == "kv2025" else 0.985)), fixed)
-            komm.append({"id": slug(n), "name": n, "region": region, "seats": seats, "results": results})
+            komm.append({"id": slug(n), "name": n, "region": region, "seats": seats, "lat": COORDS[n][0], "lon": COORDS[n][1], "results": results})
     komm.sort(key=lambda k: k["name"].replace("Aa", "Å").replace("Æ", "Zæ").replace("Ø", "Zø").replace("Å", "Zå"))
     data = {
         "meta": {"note": "EKSEMPELDATA – ikke officielle valgresultater", "count": len(komm)},

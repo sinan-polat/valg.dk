@@ -1,14 +1,16 @@
 /* Testpanel til brugertest. Aktiveres ved at åbne siden med ?test=1 (fx index.html?test=1).
-   Panelet er til facilitatoren: viser opgave, måler tid/klik/sider/blindgyder, samler SEQ og noter
-   og kan downloade alle resultater som CSV. Alt gemmes kun lokalt i browseren (localStorage) –
-   ingen data sendes nogen steder, og der indsamles ingen personoplysninger (brug et anonymt deltager-id). */
+   Panelet er diskret: en lille fane ved højre kant, der åbnes ved klik (eller Alt+T) og lukker sig selv,
+   når en opgave startes. Under en opgave viser fanen kun tiden.
+   Alt gemmes lokalt i browseren (localStorage) – ingen data sendes nogen steder, og der indsamles ingen
+   personoplysninger (brug et anonymt deltager-id). */
 (function () {
   'use strict';
   const TASKS = [
     { id: 'T1', group: 'Borger', text: 'Find ud af, hvor mange mandater Hørsholm Kommune fik ved Kommunalvalg 2025, og hvilket parti der fik flest.', answer: '19 mandater. Parti C (Det Konservative Folkeparti) fik flest (6).' },
-    { id: 'T2', group: 'Journalist / analytiker', text: 'Sammenlign mandatfordelingen i Hørsholm og Ishøj ved Kommunalvalg 2025, og hent tallene, så du kan åbne dem i et regneark.', answer: 'Når sammenligningssiden for Hørsholm vs. Ishøj og henter CSV-filen.' },
+    { id: 'T2', group: 'Journalist / analytiker', text: 'Sammenlign mandatfordelingen i Hørsholm og Ishøj ved Kommunalvalg 2025, og hent tallene, så du kan åbne dem i et regneark.', answer: 'Når sammenligningssiden for Hørsholm vs. Ishøj og henter filen.' },
     { id: 'T3', group: 'Kommunal medarbejder', text: 'Du arbejder i en kommune. Find vejledning til, hvordan resultatet indberettes efter optælling.', answer: 'Åbner artiklen "Optælling og indberetning".' },
     { id: 'T4', group: 'Borger / analytiker', text: 'Find ud af, hvilket parti der fik flest mandater i Ishøj, og om partiet fik flere eller færre mandater end ved valget i 2021.', answer: 'A (Socialdemokratiet) fik 9 mandater – ét færre end i 2021.' },
+    { id: 'T5', group: 'Journalist / analytiker', text: 'Du skal bruge valgtal fra alle kommuner i Region Hovedstaden i et regneark. Hent dem.', answer: 'Hent data-siden: området "Vælg regioner" → Region Hovedstaden → henter filen (29 kommuner).' },
   ];
   const KEY = 'valgTestResults', PKEY = 'valgTestPid';
   const params = new URLSearchParams(location.search);
@@ -34,14 +36,17 @@
   window.VTEST_ENABLED = enabled;
   if (!enabled) return;
 
-  let panel, timer;
+  let panel, tab, content, timer;
   const $ = (s, r) => (r || panel).querySelector(s);
   const el = (t, a, ...k) => { const e = document.createElement(t); Object.entries(a || {}).forEach(([n, v]) => { if (n === 'class') e.className = v; else if (n.startsWith('on')) e.addEventListener(n.slice(2), v); else if (v != null) e.setAttribute(n, v); }); k.flat().forEach(x => e.append(x && x.nodeType ? x : document.createTextNode(x == null ? '' : x))); return e; };
   const fmt = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   const elapsed = () => S.phase === 'running' ? Math.round((Date.now() - S.t0) / 1000) : S.secs;
+  const isMin = () => panel.dataset.min !== 'false';
+  const setMin = (v) => { panel.dataset.min = v ? 'true' : 'false'; tab.setAttribute('aria-expanded', String(!v)); try { sessionStorage.setItem('valgTestMin', v ? '1' : '0'); } catch (e) {} };
 
   function updateMetrics() {
     if (!panel) return;
+    tab.textContent = S.phase === 'running' ? '● ' + fmt(elapsed()) : (S.phase === 'rating' ? '✓ ' + fmt(S.secs) : 'Test');
     const m = $('#tm'); if (!m) return;
     m.querySelector('[data-k=t]').textContent = fmt(elapsed());
     m.querySelector('[data-k=c]').textContent = S.clicks;
@@ -50,32 +55,37 @@
   }
 
   function build() {
-    panel = el('aside', { id: 'testpanel', 'aria-label': 'Testpanel (facilitator)' });
+    panel = el('aside', { id: 'testpanel', 'aria-label': 'Testpanel (facilitator)', 'data-min': 'true' });
+    tab = el('button', { class: 'ttab', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'tpbody', title: 'Åbn testpanel (Alt+T)', onclick: () => setMin(false) }, 'Test');
+    content = el('div', { class: 'tpcontent', id: 'tpbody' });
+    panel.append(tab, content);
     document.body.append(panel);
+    let start = true; try { start = sessionStorage.getItem('valgTestMin') !== '0'; } catch (e) {}
+    setMin(start);
+    document.addEventListener('keydown', (e) => { if (e.altKey && (e.key === 't' || e.key === 'T')) { e.preventDefault(); setMin(!isMin()); } });
     render();
   }
 
   function render() {
     const results = load();
-    panel.innerHTML = '';
-    const min = panel.dataset.min === 'true';
-    const head = el('header', {}, 'Testpanel – facilitator', el('button', { 'aria-label': 'Fold panel ind/ud', onclick: () => { panel.dataset.min = panel.dataset.min === 'true' ? 'false' : 'true'; } }, '▾'));
+    content.innerHTML = '';
+    const head = el('header', {}, el('span', {}, 'Testpanel'), el('button', { 'aria-label': 'Luk panel', title: 'Luk (Alt+T)', onclick: () => setMin(true) }, '×'));
     const body = el('div', { class: 'body' });
-    panel.append(head, body);
-    panel.dataset.min = min ? 'true' : 'false';
+    content.append(head, body);
 
-    body.append(el('div', { class: 'row' }, el('label', { for: 'pid', style: 'font-weight:600' }, 'Deltager'), el('input', { id: 'pid', value: getPid(), style: 'width:90px', oninput: (e) => setPid(e.target.value.trim() || 'P01') }),
+    body.append(el('div', { class: 'row' }, el('label', { for: 'pid', style: 'font-weight:600' }, 'Deltager'), el('input', { id: 'pid', value: getPid(), style: 'width:70px', oninput: (e) => setPid(e.target.value.trim() || 'P01') }),
       el('button', { class: 'tb', onclick: () => { const m = /(\d+)$/.exec(getPid()); const n = m ? String(+m[1] + 1).padStart(m[1].length, '0') : '02'; setPid('P' + n); render(); } }, 'Næste')));
 
     if (S.phase === 'idle') {
-      body.append(el('div', { class: 'fine' }, 'Vælg opgave. Læs den højt for deltageren, og tryk Start. Tiden, klik, sider og blindgyder måles automatisk.'));
-      TASKS.forEach(t => body.append(el('button', { class: 'tb' + (S.task === t.id ? ' sel' : ''), style: 'text-align:left', onclick: () => { S.task = t.id; render(); } }, `${t.id} – ${t.group}`)));
+      const tasks = el('div', { class: 'row' });
+      TASKS.forEach(t => tasks.append(el('button', { class: 'tb' + (S.task === t.id ? ' sel' : ''), title: t.group, onclick: () => { S.task = t.id; render(); } }, t.id)));
+      body.append(tasks);
       const t = TASKS.find(x => x.id === S.task);
       if (t) {
-        body.append(el('div', { class: 'task' }, el('b', {}, t.id + ' · opgave til deltager'), t.text));
-        body.append(el('details', {}, el('summary', {}, 'Forventet svar (facilitator)'), el('div', { class: 'fine' }, t.answer)));
-        body.append(el('button', { class: 'tb pri', onclick: startTask }, '▶ Start opgave (gå til forsiden)'));
-      }
+        body.append(el('div', { class: 'task' }, el('b', {}, t.id + ' · ' + t.group), t.text));
+        body.append(el('details', {}, el('summary', {}, 'Forventet svar'), el('div', { class: 'fine' }, t.answer)));
+        body.append(el('button', { class: 'tb pri', onclick: startTask }, '▶ Start (panelet lukkes)'));
+      } else body.append(el('div', { class: 'fine' }, 'Vælg en opgave, læs den højt, og tryk Start.'));
     } else if (S.phase === 'running') {
       const t = TASKS.find(x => x.id === S.task);
       body.append(el('div', { class: 'task' }, el('b', {}, t.id + ' · kører'), t.text));
@@ -83,23 +93,23 @@
       body.append(el('button', { class: 'tb pri', onclick: stopTask }, '■ Stop opgave'));
     } else if (S.phase === 'rating') {
       const t = TASKS.find(x => x.id === S.task);
-      body.append(el('div', { class: 'task' }, el('b', {}, `${t.id} stoppet – ${fmt(S.secs)}`), 'Udfald og oplevet sværhed:'));
+      body.append(el('div', { class: 'task' }, el('b', {}, `${t.id} stoppet – ${fmt(S.secs)}`)));
       body.append(metricsEl());
       const out = el('div', { class: 'row' });
       ['Lykkedes', 'Delvist', 'Mislykkedes'].forEach(o => out.append(el('button', { class: 'tb' + (S.outcome === o ? ' sel' : ''), onclick: () => { S.outcome = o; render(); } }, o)));
       body.append(out);
-      body.append(el('div', { class: 'fine' }, 'SEQ: Hvor let eller svær var opgaven? (1 = meget svær, 7 = meget let)'));
+      body.append(el('div', { class: 'fine' }, 'SEQ: hvor let var opgaven? (1 = meget svær, 7 = meget let)'));
       const seq = el('div', { class: 'seq' });
       for (let i = 1; i <= 7; i++) seq.append(el('button', { class: 'tb' + (S.seq === i ? ' sel' : ''), onclick: () => { S.seq = i; render(); } }, String(i)));
       body.append(seq);
-      body.append(el('textarea', { id: 'note', rows: '3', placeholder: 'Noter: hvad sagde/gjorde deltageren? (think aloud)' }, S.note));
+      body.append(el('textarea', { id: 'note', rows: '3', placeholder: 'Noter (think aloud)' }, S.note));
       body.append(el('button', { class: 'tb pri', onclick: saveTask }, 'Gem opgave'));
     }
 
-    body.append(el('hr', { style: 'border:0;border-top:1px solid #D5DDE6;width:100%' }));
-    body.append(el('div', { class: 'fine' }, `${results.length} opgave(r) gemt lokalt i denne browser.`));
+    body.append(el('hr', { style: 'border:0;border-top:1px solid #D5DDE6;width:100%;margin:2px 0' }));
+    body.append(el('div', { class: 'fine' }, `${results.length} opgave(r) gemt lokalt.`));
     body.append(el('div', { class: 'row' },
-      el('button', { class: 'tb', onclick: () => download(results) }, '⬇ Download CSV'),
+      el('button', { class: 'tb', onclick: () => download(results) }, '⬇ CSV'),
       el('button', { class: 'tb', onclick: () => { if (confirm('Slet alle gemte testresultater i denne browser?')) { save([]); render(); } } }, 'Nulstil')));
     updateMetrics();
   }
@@ -107,13 +117,13 @@
   function metricsEl() {
     return el('div', { class: 'metrics', id: 'tm' },
       el('div', {}, el('b', { 'data-k': 't' }, '00:00'), 'tid'), el('div', {}, el('b', { 'data-k': 'c' }, '0'), 'klik'),
-      el('div', {}, el('b', { 'data-k': 'p' }, '0'), 'sider'), el('div', {}, el('b', { 'data-k': 'd' }, '0'), 'blindgyder'));
+      el('div', {}, el('b', { 'data-k': 'p' }, '0'), 'sider'), el('div', {}, el('b', { 'data-k': 'd' }, '0'), 'blindg.'));
   }
 
   function startTask() {
     Object.assign(S, { phase: 'running', t0: Date.now(), clicks: 0, routes: [], dead: 0, sorts: 0, exports: 0, searches: 0, secs: 0, outcome: '', seq: 0, note: '' });
     clearInterval(timer); timer = setInterval(updateMetrics, 500);
-    render();
+    setMin(true); render();
     if (location.hash === '#/' || location.hash === '' || location.hash === '#') { window.dispatchEvent(new HashChangeEvent('hashchange')); } else { location.hash = '#/'; }
     S.routes = ['#/'];
     updateMetrics();
@@ -140,7 +150,7 @@
 
   document.addEventListener('click', (e) => {
     if (S.phase !== 'running' || (panel && panel.contains(e.target))) return;
-    if (e.target.closest('a,button,summary,label.pill,li[role=option],input,select')) { S.clicks++; updateMetrics(); }
+    if (e.target.closest('a,button,summary,label.pill,li[role=option],input,select,.bub,.reg')) { S.clicks++; updateMetrics(); }
   }, true);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();

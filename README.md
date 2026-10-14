@@ -4,24 +4,24 @@ Kodet, klikbar prototype (ren HTML, CSS og JavaScript – ingen frameworks, inge
 
 > **Vigtigt:** Alle tal er **eksempeldata** (genereret af `tools/generate_data.py`). Prototypen er **ikke** den officielle Valg.dk og indeholder ingen officielle valgresultater. Det fremgår af banner og footer på alle sider.
 
-## Hvad kan prototypen?
-
+Hvad kan prototypen?
 | Skærm | Adresse | Hvad virker |
 |---|---|---|
-| 1 Forside | `#/` | Opgavekort (hvad kommer du for?), søgning med forslag, seneste valg, valgtyper som accordion |
-| 2 Find resultat | `#/find` | Vælg valg, søg med forslag (tastatur virker), find via region, ofte søgte |
-| 3 Kommuneresultat | `#/resultat/horsholm` | Mandater først, nøgletal, mandatfordeling, **sortering Størst først / A–Å med animation**, ændring ift. 2021, download til Excel/CSV |
-| 4 Sammenlign (opsætning) | `#/sammenlign` | 2–3 områder, valg, hvad skal sammenlignes, validering |
-| 5 Sammenligning (resultat) | `#/sammenlign/resultat?...` | Søjlediagram eller tabel, 4 mål (mandater, stemmeprocent, valgdeltagelse, ændring), download til Excel/CSV |
-| 6 Vejledning | `#/vejledning` | Søg/filtrér vejledninger, kategorier, seneste opdateringer |
-| 7 Vejledning (detalje) | `#/vejledning/optaelling` | Trin-for-trin med afkrydsning og fremdrift, kobling til borgerresultat |
-| Blindgyde | `#/ikke-med` | Alt, der ikke er bygget, ender her – og tælles som "blindgyde" i testen |
+| Forside | #/ | Opgavekort, søgning, skematisk Danmarkskort med regioner (valgdeltagelse / største parti), landsresultat, regioner |
+| Find resultat | #/find | Valg, søgning på kommune/region, hurtigvalg for Hele landet og regioner |
+| Resultat | #/resultat/horsholm, #/resultat/region-hovedstaden, #/resultat/land | Mandater, sortering, ændring, kort og kommuneliste for regioner/landet, download |
+| Sammenlign | #/sammenlign | 2–3 områder (kommuner, regioner, hele landet) i diagram eller tabel |
+| Hent data | #/data | Guide i 4 trin: nøgletal/parti, hele landet/regioner/kommuner, valg, format. Forhåndsvisning og download |
+| Vejledning | #/vejledning | Søg og trin-for-trin-artikler |
+| Faste sider | #/om-valg, #/driftstatus, #/tilgaengelighed, #/privatliv, #/sitemap | Tekst gengivet fra officielle valg.dk (gælder ikke prototypen) |
 
-Data: 98 kommuner × 2 valg (Kommunalvalg 2025 og 2021). Mandater er beregnet med d'Hondt, så de passer til stemmetallene. Hørsholm (19 mandater) og Ishøj (15 mandater) er faste testcases.
+Kortet er skematisk (ikke et officielt kort); kommunernes placering er omtrentlig, og cirklens areal viser antal valgberettigede, så København ikke ser lille ud. Alle tal er eksempeldata.
 
-Ekstra: tilgængelighed (tastatur, skip-link, ARIA, fokus, `prefers-reduced-motion`), mobilvisning og print.
+Testpanel: åbn adressen med ?test=1. Panelet er en diskret fane i højre kant (Alt+T åbner/lukker) og lukker selv ved Start. Opgaver T1–T5; T5 = hent tal for alle kommuner i Region Hovedstaden (Hent data > Udvalgte regioner, 29 kommuner).
 
-## Læg den på GitHub Pages (ca. 5 minutter)
+Opdater siden: git add . / git commit -m "Opdatering" / git push.
+
+Læg den på GitHub Pages (ca. 5 minutter)
 
 1. Log ind på github.com og klik **New repository**. Giv det et neutralt navn, fx `valg-prototype`. Vælg **Public**. (Gratis Pages kræver et offentligt repository.)
 2. På repoets side: **uploading an existing file**. Træk **hele indholdet** af denne mappe ind (`index.html`, `css/`, `js/`, `tools/`, `README.md`, `.nojekyll`). Husk, at `index.html` skal ligge øverst i repoet. Klik **Commit changes**.

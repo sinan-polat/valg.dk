@@ -17,23 +17,38 @@
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav class="nav" id="nav" aria-label="Hovedmenu">
       <a href="#/find" data-nav="find">Valgresultater</a>
+      <a href="#/sammenlign" data-nav="sammenlign">Sammenlign</a>
+      <a href="#/data" data-nav="data">Hent data</a>
       <a href="#/om-valg" data-nav="om-valg">Om valg</a>
-      <a href="#/sammenlign" data-nav="sammenlign">Tal og data</a>
       <a href="#/vejledning" data-nav="vejledning">Hjælp</a>
     </nav>
-    <div class="header-right"><a href="#/ikke-med?side=English">English</a></div>
   </div>
 </header>
 <main id="main" tabindex="-1"></main>
 <footer class="site-footer">
   <div class="in">
-    <a class="logo" href="#/">valg.dk</a>
+    <div class="cols">
+      <div>
+        <a class="logo" href="#/">valg.dk</a>
+        <p class="fabout">Valg.dk er den offentlige indgang for valg i Danmark. Her kan du både finde valgresultater for igangværende og tidligere valg. KOMBIT er ansvarlig for hjemmesiden VALG.dk. Hvis du har spørgsmål, kan du kontakte valg@kombit.dk.</p>
+      </div>
+      <nav aria-label="Genveje i bunden">
+        <ul class="flinks">
+          <li><a href="#/tilgaengelighed">Tilgængelighedserklæring</a></li>
+          <li><a href="#/data">Eksport af data</a></li>
+          <li><a href="#/driftstatus">Driftstatus for valg.dk</a></li>
+          <li><a href="#/privatliv">Privatlivspolitik og brug af data</a></li>
+          <li><a href="#/sitemap">Sitemap</a></li>
+        </ul>
+      </nav>
+    </div>
     <small>Prototype til bachelorprojekt (Zealand, PBA Digital Konceptudvikling) i samarbejde med KOMBIT – ikke den officielle Valg.dk. Alle tal er eksempeldata.</small>
-    <small><a href="#/om-valg">Om valg</a> · <a href="#/sammenlign">Tal og data</a> · <a href="#/vejledning">Hjælp</a> · <a href="#/ikke-med?side=Tilgængelighed">Tilgængelighed</a></small>
   </div>
 </footer>
 <noscript><p style="padding:24px">Prototypen kræver JavaScript.</p></noscript>
 <script src="js/data.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/pages.js"></script>
 <script src="js/test-mode.js"></script>
 <script src="js/app.js"></script>
 </body>
