@@ -117,3 +117,6 @@ Resultat, sammenligning, parti og Hent data har knapperne Kopiér link (adressen
 
 ## Stemmeændringer og afstemningsområder
 Partitabellerne viser nu ændring i stemmeandel (%-point) og i antal stemmer ift. forrige valg, ud over ændring i mandater. Hver kommune har afstemningsområder (fiktive navne og tal, summerer til kommunens tal), og Hent data kan hente data pr. afstemningsområde.
+
+## Logo
+Logoet ligger i `img/valg.svg` (lyst logo til den mørke header/footer) og bruges i `index.html`. Det er dekorativt (`alt=""`); linket har `aria-label`.
