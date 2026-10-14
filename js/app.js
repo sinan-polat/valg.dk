@@ -10,6 +10,7 @@
   const log = (t, d) => { if (window.VLOG) window.VLOG(t, d); };
   const COL = ['#0B4FBF', '#E6732F', '#12998F'];
   const DEFAULT_VALG = 'kv2025';
+  const isA = window.VVER === 'a'; // version A = nuværende struktur (valgtype først)
 
   /* ---------- hjælpere ---------- */
   const fmtN = n => Math.round(n).toLocaleString('da-DK');
@@ -202,8 +203,29 @@
       h('p', { class: 'mapnote' }, 'Skematisk kort med eksempeldata. Hver cirkel er en kommune – cirklens areal viser antal valgberettigede, så store kommuner som København fylder mere. Klik på en cirkel eller region for at se resultatet.'));
   }
 
+  function accordion(linkFor) {
+    const accData = [
+      ['Kommunalvalg', 'Find resultater fra kommunalvalg i hele Danmark', [h('a', { href: linkFor('kv2025') }, 'Kommunalvalg 2025'), h('a', { href: linkFor('kv2021') }, 'Kommunalvalg 2021')]],
+      ['Regionsrådsvalg', 'Find resultater fra regionsrådsvalg i hele Danmark', null],
+      ['Europa-Parlamentsvalg', 'Find resultater fra Europa-Parlamentsvalg i Danmark', null],
+      ['Folkeafstemning', 'Find resultater fra folkeafstemninger i Danmark', null],
+    ];
+    const acc = h('div', { class: 'acc' });
+    accData.forEach(([t, d, links], i) => {
+      const bid = 'acc-b' + i, pid = 'acc-p' + i;
+      const item = h('div', { class: 'acc-item', 'data-open': 'false' });
+      const btn = h('button', { type: 'button', id: bid, 'aria-expanded': 'false', 'aria-controls': pid }, h('span', { class: 't' }, t), h('span', { class: 'd' }, d), h('span', { class: 'pm', 'aria-hidden': 'true' }, '+'));
+      const body = h('div', { class: 'acc-body', id: pid, role: 'region', 'aria-labelledby': bid }, h('div', {}, h('div', { class: 'in' },
+        links || [h('p', {}, 'Resultater fra dette valg er ikke med i prototypen.'), h('a', { href: href('/ikke-med', { side: t }) }, 'Læs mere')])));
+      btn.addEventListener('click', () => { const o = item.dataset.open !== 'true'; item.dataset.open = String(o); btn.setAttribute('aria-expanded', String(o)); });
+      item.append(btn, body); acc.append(item);
+    });
+    return acc;
+  }
+
   /* ---------- forside ---------- */
   function home() {
+    if (isA) return homeA();
     document.title = 'valg.dk – prototype';
     const el = h('div', { class: 'page wrap' });
     const inp = h('input', { type: 'text', id: 'q', placeholder: 'Søg kommune, region, kandidat, parti eller valg …', 'aria-label': 'Søg på valg.dk', 'data-enter': 'first' });
@@ -247,29 +269,60 @@
     el.append(h('section', { class: 'section', 'aria-labelledby': 'h-map' }, h('h2', { id: 'h-map', style: 'margin-bottom:18px' }, ELS[DEFAULT_VALG].name + ' – resultater på kortet'),
       h('div', { class: 'mapsec' }, mapCard({ valg: DEFAULT_VALG, title: 'Danmark og regionerne' }), status)));
 
-    const accData = [
-      ['Kommunalvalg', 'Find resultater fra kommunalvalg i hele Danmark', [h('a', { href: href('/find', { valg: 'kv2025' }) }, 'Kommunalvalg 2025'), h('a', { href: href('/find', { valg: 'kv2021' }) }, 'Kommunalvalg 2021')]],
-      ['Regionsrådsvalg', 'Find resultater fra regionsrådsvalg i hele Danmark', null],
-      ['Europa-Parlamentsvalg', 'Find resultater fra Europa-Parlamentsvalg i Danmark', null],
-      ['Folkeafstemning', 'Find resultater fra folkeafstemninger i Danmark', null],
-    ];
-    const acc = h('div', { class: 'acc' });
-    accData.forEach(([t, d, links], i) => {
-      const bid = 'acc-b' + i, pid = 'acc-p' + i;
-      const item = h('div', { class: 'acc-item', 'data-open': 'false' });
-      const btn = h('button', { type: 'button', id: bid, 'aria-expanded': 'false', 'aria-controls': pid }, h('span', { class: 't' }, t), h('span', { class: 'd' }, d), h('span', { class: 'pm', 'aria-hidden': 'true' }, '+'));
-      const body = h('div', { class: 'acc-body', id: pid, role: 'region', 'aria-labelledby': bid }, h('div', {}, h('div', { class: 'in' },
-        links || [h('p', {}, 'Resultater fra dette valg er ikke med i prototypen.'), h('a', { href: href('/ikke-med', { side: t }) }, 'Læs mere')])));
-      btn.addEventListener('click', () => { const o = item.dataset.open !== 'true'; item.dataset.open = String(o); btn.setAttribute('aria-expanded', String(o)); });
-      item.append(btn, body); acc.append(item);
-    });
+    const acc = accordion(id => href('/find', { valg: id }));
     el.append(h('section', { class: 'section', 'aria-labelledby': 'h-oth' },
       h('div', { style: 'display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px' }, h('h2', { id: 'h-oth' }, 'Andre valgtyper'), h('a', { href: '#/find', style: 'font-weight:600' }, 'Se alle valgresultater  →')), acc));
     return el;
   }
 
+  /* ---------- version A: nuværende struktur (valgtype først) ---------- */
+  function heroSearch() {
+    const inp = h('input', { type: 'text', id: 'q', placeholder: 'Søg kommune, region, kandidat, parti eller valg …', 'aria-label': 'Søg på valg.dk', 'data-enter': 'first' });
+    function pickSearch(it) { log('search', it.label); location.hash = it.type === 'valg' ? href('/valg/' + it.id) : resultHref(it.id, DEFAULT_VALG); }
+    const go = () => { const v = inp.value.trim(); if (!v) return; const f = searchAll(v)[0]; log('search', v); if (f) pickSearch(f); else location.hash = href('/ikke-med', { side: 'Søgning efter «' + v + '»' }); };
+    const form = h('form', { class: 'search', role: 'search', onsubmit: e => { e.preventDefault(); go(); } },
+      h('div', { class: 'box' }, inp, h('button', { class: 'btn', type: 'submit' }, 'Søg')),
+      h('p', { class: 'hint' }, 'Fx København eller Kommunalvalg 2025'));
+    autocomplete(inp, searchAll, pickSearch);
+    return form;
+  }
+  function homeA() {
+    document.title = 'valg.dk – prototype';
+    return h('div', { class: 'page wrap' },
+      h('div', { class: 'hero' }, h('div', {}, h('p', { class: 'eyebrow' }, 'Officielle valgresultater i Danmark'), h('h1', {}, 'Velkommen til valg.dk'),
+        h('p', { class: 'lead' }, 'Her kan du finde valgresultater for igangværende og tidligere valg.'), h('div', { style: 'margin-top:28px;max-width:640px' }, heroSearch()))),
+      h('section', { class: 'section', 'aria-labelledby': 'h-vt' }, h('h2', { id: 'h-vt', style: 'margin-bottom:18px' }, 'Vælg valg'), accordion(id => href('/valg/' + id))));
+  }
+  function valgList() {
+    document.title = 'Valgresultater – valg.dk (prototype)';
+    return h('div', { class: 'page wrap' }, crumb({ t: 'Forside', href: '#/' }, { t: 'Valgresultater' }),
+      h('h1', {}, 'Valgresultater'), h('p', { class: 'lead' }, 'Vælg først, hvilken type valg du leder efter.'),
+      h('div', { style: 'margin-top:26px' }, accordion(id => href('/valg/' + id))));
+  }
+  function valgPage(parts) {
+    const id = parts[1];
+    if (!ELS[id]) return ikkeMed([], { side: 'Ukendt valg' });
+    document.title = ELS[id].name + ' – valg.dk (prototype)';
+    const inp = h('input', { type: 'text', id: 'area', placeholder: 'Skriv kommunens navn …', 'aria-label': 'Søg efter kommune', 'data-enter': 'first' });
+    const pick = it => { log('search', it.label); location.hash = resultHref(it.id, id); };
+    autocomplete(inp, searchKommuner, pick);
+    const form = h('form', { class: 'search', role: 'search', onsubmit: e => { e.preventDefault(); const f = searchKommuner(inp.value)[0]; if (f) pick(f); } }, h('div', { class: 'box' }, inp, h('button', { class: 'btn', type: 'submit' }, 'Søg')));
+    return h('div', { class: 'page wrap' }, crumb({ t: 'Forside', href: '#/' }, { t: 'Valgresultater', href: '#/find' }, { t: ELS[id].name }),
+      h('h1', {}, ELS[id].name), h('p', { class: 'lead' }, ELS[id].date + ' · Endeligt resultat'),
+      h('div', { class: 'panel', style: 'margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap' },
+        h('div', {}, h('h2', { style: 'font-size:20px' }, 'Landsresultat'), h('p', { style: 'color:var(--muted)' }, 'Samlet resultat for alle kommuner')),
+        h('a', { class: 'btn', href: resultHref('land', id) }, 'Se landsresultat')),
+      h('section', { class: 'section', 'aria-labelledby': 'h-kom' }, h('h2', { id: 'h-kom', style: 'margin-bottom:14px' }, 'Find din kommune'), form,
+        h('div', { style: 'margin-top:18px' }, REG.map(r => h('details', { class: 'panel', style: 'padding:14px 20px;margin-bottom:10px' },
+          h('summary', { style: 'cursor:pointer;font-weight:700' }, r.name),
+          h('p', { style: 'margin-top:12px;display:flex;flex-wrap:wrap;gap:6px 22px' }, h('a', { href: resultHref(r.id, id), style: 'font-weight:700' }, 'Hele regionen'), KOM.filter(k => regOf(k) === r.id).map(k => h('a', { href: resultHref(k.id, id) }, k.name))))))),
+      h('section', { class: 'section', 'aria-labelledby': 'h-tool' }, h('h2', { id: 'h-tool', style: 'margin-bottom:14px' }, 'Tal og værktøjer til dette valg'),
+        h('div', { class: 'list' }, h('a', { href: href('/sammenlign', { valg: id }) }, h('strong', {}, 'Sammenlign områder'), h('small', {}, 'Kommuner og regioner side om side')), h('a', { href: href('/data', { valg: id }) }, h('strong', {}, 'Eksport af data'), h('small', {}, 'Hent tal som regneark')))));
+  }
+
   /* ---------- find resultat ---------- */
   function find(parts, q) {
+    if (isA) return valgList();
     document.title = 'Find resultat – valg.dk (prototype)';
     let valg = ELS[q.valg] ? q.valg : DEFAULT_VALG;
     const inp = h('input', { type: 'text', id: 'area', placeholder: 'Skriv kommune eller region …', 'aria-label': 'Søg efter område', 'data-enter': 'first' });
@@ -329,7 +382,7 @@
     const rows0 = partyRows(k, valg);
     const maxM = Math.max(...rows0.map(r => r.m), 1);
     const el = h('div', { class: 'page wrap' });
-    const crumbs = [{ t: 'Forside', href: '#/' }, { t: 'Find resultat', href: href('/find', { valg }) }];
+    const crumbs = isA ? [{ t: 'Forside', href: '#/' }, { t: 'Valgresultater', href: '#/find' }, { t: ELS[valg].name, href: href('/valg/' + valg) }] : [{ t: 'Forside', href: '#/' }, { t: 'Find resultat', href: href('/find', { valg }) }];
     if (k.type === 'kommune') crumbs.push({ t: k.region, href: resultHref(k.regionId, valg) });
     crumbs.push({ t: k.label });
     el.append(crumb(...crumbs));
@@ -384,7 +437,9 @@
     el.append(h('div', { class: 'tbl-wrap' }, h('table', { class: 'tbl' }, h('caption', { class: 'sr-only' }, `Resultat for ${k.label}, ${ELS[valg].name}`),
       h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, 'Parti'), h('th', { scope: 'col', class: 'num' }, 'Stemmer'), h('th', { scope: 'col', class: 'num' }, 'Andel'), h('th', { scope: 'col' }, 'Mandater'), P ? h('th', { scope: 'col', class: 'num' }, 'Ændring') : null)), tbody)));
 
-    if (k.type !== 'kommune') {
+    if (k.type !== 'kommune' && isA) {
+      el.append(subTable(k, valg));
+    } else if (k.type !== 'kommune') {
       el.append(h('section', { class: 'regtop', 'aria-label': 'Kort og kommuner' },
         mapCard({ valg, region: k.type === 'region' ? k.id : null, title: k.type === 'region' ? 'Kommunerne i ' + k.short : 'Alle kommuner' }),
         h('div', { class: 'panel' }, h('h3', { style: 'margin-bottom:8px' }, 'Hent tallene for ' + (k.type === 'region' ? 'regionen' : 'hele landet')),
@@ -392,7 +447,7 @@
           h('a', { class: 'btn', href: href('/data', k.type === 'region' ? { scope: 'regioner', r: k.id, valg } : { scope: 'land', valg }) }, k.type === 'region' ? 'Hent data for regionen' : 'Hent data for hele landet'),
           h('p', { style: 'margin-top:16px' }, h('a', { href: href('/sammenlign', { a: k.id, valg }) }, 'Sammenlign med andre områder  →')))));
       el.append(subTable(k, valg));
-    } else {
+    } else if (!isA) {
       el.append(h('div', { class: 'panel tint section cta' }, h('div', {}, h('h2', { style: 'font-size:22px' }, 'Vil du sammenligne med en anden kommune?'), h('p', { style: 'color:var(--muted);margin-top:6px' }, 'Sæt områder side om side i et diagram.')),
         h('a', { class: 'btn', href: href('/sammenlign', { a: k.id, valg }) }, 'Sammenlign områder  →')));
     }
@@ -690,9 +745,68 @@
   }
 
 
+  /* ---------- testresultater (kun facilitator, ?test=1) ---------- */
+  function parseCsv(text) {
+    const lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(Boolean);
+    const split = l => { const out = []; let cur = '', q = false; for (let i = 0; i < l.length; i++) { const c = l[i]; if (q) { if (c === '"' && l[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; } else if (c === '"') q = true; else if (c === ';') { out.push(cur); cur = ''; } else cur += c; } out.push(cur); return out; };
+    const head = split(lines[0]);
+    return lines.slice(1).map(l => Object.fromEntries(split(l).map((v, i) => [head[i], v])));
+  }
+  function testresultater() {
+    document.title = 'Testresultater – valg.dk (prototype)';
+    if (!window.VTEST_ENABLED) return h('div', { class: 'page wrap' }, h('h1', {}, 'Testresultater'), h('p', { class: 'lead' }, 'Siden er kun til facilitatoren. Åbn prototypen med ?test=1.'));
+    let stored = []; try { stored = JSON.parse(localStorage.getItem('valgTestResults') || '[]'); } catch (e) {}
+    let extra = [], metric = 'tid';
+    const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? null : n; };
+    const med = a => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+    const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+    const VN = { a: 'Version A – nuværende struktur', b: 'Version B – opgavebaseret' };
+    const METRICS = {
+      tid: ['Median tid (sek.)', l => med(l.map(r => num(r.sekunder)).filter(x => x != null)), 0],
+      klik: ['Gennemsnit klik', l => avg(l.map(r => num(r.klik)).filter(x => x != null)), 1],
+      succes: ['Lykkedes (%)', l => l.length ? l.filter(r => r.udfald === 'Lykkedes').length / l.length * 100 : null, 0],
+      seq: ['SEQ (1–7, højere er bedre)', l => avg(l.map(r => num(r.seq)).filter(x => x != null)), 1],
+      blind: ['Gennemsnit blindgyder', l => avg(l.map(r => num(r.blindgyder)).filter(x => x != null)), 1],
+    };
+    const root = h('div', { class: 'page wrap' });
+    const body = h('div');
+    function draw() {
+      const all = stored.concat(extra).map(r => Object.assign({ version: 'b' }, r));
+      const tasks = [...new Set(all.filter(r => r.opgave && r.opgave !== 'SUS').map(r => r.opgave))].sort();
+      const sus = all.filter(r => r.opgave === 'SUS');
+      body.innerHTML = '';
+      if (!all.length) { body.append(h('p', { class: 'panel', style: 'margin-top:24px' }, 'Ingen testdata endnu. Kør opgaver med testpanelet, eller indlæs en CSV-fil nedenfor.')); return; }
+      const cell = (t, v) => { const l = all.filter(r => r.opgave === t && (r.version || 'b') === v); return l; };
+      const pcount = v => new Set(all.filter(r => (r.version || 'b') === v).map(r => r.deltager)).size;
+      body.append(h('div', { class: 'areacards' }, ['a', 'b'].map((v, i) => {
+        const s = sus.filter(r => (r.version || 'b') === v).map(r => num(r.sus_score)).filter(x => x != null), m = avg(s);
+        return h('div', { class: 'areacard' }, h('i', { style: `background:${COL[i]}`, 'aria-hidden': 'true' }), h('div', {}, h('div', { class: 'n' }, VN[v]), h('div', { class: 'v' }, pcount(v) + ' deltagere'), h('div', { class: 'n' }, m == null ? 'SUS: ingen svar' : 'SUS gennemsnit: ' + fmtP(m, 1).replace(' %', '') + ' (68 = gennemsnitligt)')));
+      })));
+      body.append(h('div', { class: 'pills', role: 'group', 'aria-label': 'Vælg mål' }, Object.entries(METRICS).map(([id, m]) => h('button', { class: 'pill', type: 'button', 'aria-pressed': String(id === metric), onclick: () => { metric = id; draw(); } }, m[0]))));
+      const M = METRICS[metric];
+      const series = ['a', 'b'].map((v, i) => ({ name: VN[v], color: COL[i], values: tasks.map(t => { const x = M[1](cell(t, v)); return x == null ? 0 : +x.toFixed(M[2]); }) }));
+      body.append(h('div', { class: 'chart', style: 'margin-top:18px' }, h('div', { class: 'chart-legend' }, series.map(se => h('span', {}, h('i', { style: `background:${se.color}` }), se.name))), barChart({ cats: tasks, series, decimals: M[2] })));
+      const head = ['Opgave', 'Version', 'N', 'Lykkedes (%)', 'Median tid (sek.)', 'Gns. klik', 'Gns. blindgyder', 'Gns. SEQ'];
+      const f1 = x => x == null ? '–' : x.toLocaleString('da-DK', { maximumFractionDigits: 1 });
+      const trows = [];
+      tasks.forEach(t => ['a', 'b'].forEach(v => { const l = cell(t, v); if (l.length) trows.push([t, v.toUpperCase(), l.length, METRICS.succes[1](l), METRICS.tid[1](l), METRICS.klik[1](l), METRICS.blind[1](l), METRICS.seq[1](l)]); }));
+      body.append(h('div', { class: 'tbl-wrap', style: 'margin-top:20px' }, h('table', { class: 'tbl' }, h('caption', { class: 'sr-only' }, 'Opsummering pr. opgave og version'),
+        h('thead', {}, h('tr', {}, head.map((t, i) => h('th', { scope: 'col', class: i > 1 ? 'num' : '' }, t)))),
+        h('tbody', {}, trows.map(r => h('tr', {}, r.map((v, i) => h('td', { class: i > 1 ? 'num' : '' }, i < 3 ? String(v) : f1(v)))))))));
+      body.append(h('div', { class: 'toolbar' }, h('span', { class: 'spacer' }), h('button', { class: 'btn secondary small', type: 'button', onclick: () => download('testopsummering.csv', csv(head, trows.map(r => r.map((v, i) => i < 3 ? v : (v == null ? '' : +v.toFixed(2)))), { sep: ';', dec: ',' })) }, '⬇ Hent opsummering (Excel)')));
+      body.append(h('p', { class: 'source' }, 'Små stikprøver (3–5 pr. gruppe): brug tallene til at pege på mønstre, ikke som statistisk bevis.'));
+    }
+    const file = h('input', { type: 'file', accept: '.csv', id: 'imp', onchange: e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { extra = extra.concat(parseCsv(t)); draw(); }); } });
+    root.append(crumb({ t: 'Forside', href: '#/' }, { t: 'Testresultater' }), h('h1', {}, 'Testresultater'),
+      h('p', { class: 'lead' }, 'Sammenligning af version A (nuværende struktur) og version B (opgavebaseret) – læst fra testpanelets data i denne browser.'),
+      h('div', { class: 'panel', style: 'margin-top:20px;max-width:760px' }, h('label', { for: 'imp', style: 'font-weight:600;display:block;margin-bottom:8px' }, 'Indlæs flere CSV-filer fra testpanelet (fra andre enheder)'), file), body);
+    draw();
+    return root;
+  }
+
   /* ---------- router ---------- */
-  const routes = { '': home, find, resultat, sammenlign, data: dataPage, 'om-valg': omValg, driftstatus: driftPage, tilgaengelighed: tilgPage, privatliv: privPage, sitemap: sitemapPage, 'ikke-med': ikkeMed };
-  const NAVKEY = { resultat: 'find' };
+  const routes = { '': home, find, valg: valgPage, testresultater, resultat, sammenlign, data: dataPage, 'om-valg': omValg, driftstatus: driftPage, tilgaengelighed: tilgPage, privatliv: privPage, sitemap: sitemapPage, 'ikke-med': ikkeMed };
+  const NAVKEY = { resultat: 'find', valg: 'find' };
   function render() {
     const { parts, q } = parse();
     const view = routes[parts[0] || ''] || ((p, qq) => ikkeMed(p, { side: location.hash }));
@@ -700,7 +814,7 @@
     let node;
     try { node = view(parts, q); } catch (e) { console.error(e); node = h('div', { class: 'page wrap' }, h('h1', {}, 'Noget gik galt'), h('p', {}, String(e))); }
     main.append(node);
-    document.querySelectorAll('[data-nav]').forEach(a => { const on = a.dataset.nav === (NAVKEY[parts[0]] || parts[0] || ''); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
+    document.querySelectorAll('[data-nav]').forEach(a => { if (isA) a.hidden = a.dataset.nav === 'sammenlign' || a.dataset.nav === 'data'; const on = a.dataset.nav === (NAVKEY[parts[0]] || parts[0] || ''); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
     window.scrollTo(0, 0);
     main.focus({ preventScroll: true });
     log('route', location.hash || '#/');

@@ -45,7 +45,22 @@ Siden har `noindex`, så søgemaskiner ikke bør vise den, men et offentligt lin
 
 Tip: Skjul panelet (pilen) under skærmdeling, og læs selv opgaven højt.
 
-### Testopgaver og forventede svar
+### ## A/B-test: nuværende struktur mod opgavebaseret
+
+Prototypen har to versioner med samme data, samme sider og samme opgaver:
+
+| Version | Adresse (send til deltageren) | Struktur |
+|---|---|---|
+| A – nuværende struktur | `https://sinan-polat.github.io/valg.dk/?v=a` | Valgtype først: forside med valgtyper, derefter valg, derefter område. Sammenlign og Eksport ligger kun under det enkelte valg (og Eksport i footeren). Intet kort. |
+| B – opgavebaseret | `https://sinan-polat.github.io/valg.dk/?v=b` (standard) | Opgavekort, kort over Danmark og regioner, Sammenlign og Hent data i hovedmenuen |
+
+Versionen huskes i browserfanen. Del deltagerne ligeligt (fx P01, P03 … får A, P02, P04 … får B), og lad dem løse de samme opgaver. Facilitatoren åbner med `?test=1&v=a` eller `&v=b` og kan også skifte version i testpanelet.
+
+Testpanelet gemmer pr. opgave: version, tid, klik, sider, blindgyder, første klik, udfald og SEQ. Knappen SUS åbner de ti SUS-spørgsmål, som stilles efter alle opgaver; scoren (0–100, 68 er gennemsnit) gemmes sammen med versionen.
+
+Siden `#/testresultater` (kun med `?test=1`) sammenligner A og B pr. opgave med diagram, tabel og SUS, og kan indlæse CSV-filer fra andre enheder og hente en opsummering til Excel. Stikprøverne er små, så brug resultaterne til at pege på mønstre og ikke som statistisk bevis.
+
+Testopgaver og forventede svar
 
 | Id | Brugergruppe | Opgave | Forventet svar |
 |---|---|---|---|
