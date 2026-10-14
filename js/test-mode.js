@@ -8,9 +8,8 @@
   const TASKS = [
     { id: 'T1', group: 'Borger', text: 'Find ud af, hvor mange mandater Hørsholm Kommune fik ved Kommunalvalg 2025, og hvilket parti der fik flest.', answer: '19 mandater. Parti C (Det Konservative Folkeparti) fik flest (6).' },
     { id: 'T2', group: 'Journalist / analytiker', text: 'Sammenlign mandatfordelingen i Hørsholm og Ishøj ved Kommunalvalg 2025, og hent tallene, så du kan åbne dem i et regneark.', answer: 'Når sammenligningssiden for Hørsholm vs. Ishøj og henter filen.' },
-    { id: 'T3', group: 'Kommunal medarbejder', text: 'Du arbejder i en kommune. Find vejledning til, hvordan resultatet indberettes efter optælling.', answer: 'Åbner artiklen "Optælling og indberetning".' },
-    { id: 'T4', group: 'Borger / analytiker', text: 'Find ud af, hvilket parti der fik flest mandater i Ishøj, og om partiet fik flere eller færre mandater end ved valget i 2021.', answer: 'A (Socialdemokratiet) fik 9 mandater – ét færre end i 2021.' },
-    { id: 'T5', group: 'Journalist / analytiker', text: 'Du skal bruge valgtal fra alle kommuner i Region Hovedstaden i et regneark. Hent dem.', answer: 'Hent data-siden: området "Vælg regioner" → Region Hovedstaden → henter filen (29 kommuner).' },
+    { id: 'T3', group: 'Borger / analytiker', text: 'Find ud af, hvilket parti der fik flest mandater i Ishøj, og om partiet fik flere eller færre mandater end ved valget i 2021.', answer: 'A (Socialdemokratiet) fik 9 mandater – ét færre end i 2021.' },
+    { id: 'T4', group: 'Journalist / analytiker', text: 'Du skal bruge valgtal fra alle kommuner i Region Hovedstaden i et regneark. Hent dem.', answer: 'Hent data-siden: området "Vælg regioner" → Region Hovedstaden → henter filen (29 kommuner).' },
   ];
   const KEY = 'valgTestResults', PKEY = 'valgTestPid';
   const params = new URLSearchParams(location.search);

@@ -12,12 +12,11 @@ Hvad kan prototypen?
 | Resultat | #/resultat/horsholm, #/resultat/region-hovedstaden, #/resultat/land | Mandater, sortering, ændring, kort og kommuneliste for regioner/landet, download |
 | Sammenlign | #/sammenlign | 2–3 områder (kommuner, regioner, hele landet) i diagram eller tabel |
 | Hent data | #/data | Guide i 4 trin: nøgletal/parti, hele landet/regioner/kommuner, valg, format. Forhåndsvisning og download |
-| Vejledning | #/vejledning | Søg og trin-for-trin-artikler |
 | Faste sider | #/om-valg, #/driftstatus, #/tilgaengelighed, #/privatliv, #/sitemap | Tekst gengivet fra officielle valg.dk (gælder ikke prototypen) |
 
 Kortet er skematisk (ikke et officielt kort); kommunernes placering er omtrentlig, og cirklens areal viser antal valgberettigede, så København ikke ser lille ud. Alle tal er eksempeldata.
 
-Testpanel: åbn adressen med ?test=1. Panelet er en diskret fane i højre kant (Alt+T åbner/lukker) og lukker selv ved Start. Opgaver T1–T5; T5 = hent tal for alle kommuner i Region Hovedstaden (Hent data > Udvalgte regioner, 29 kommuner).
+Testpanel: åbn adressen med ?test=1. Panelet er en diskret fane i højre kant (Alt+T åbner/lukker) og lukker selv ved Start. Opgaver T1–T4; T4 = hent tal for alle kommuner i Region Hovedstaden (Hent data > Udvalgte regioner, 29 kommuner).
 
 Opdater siden: git add . / git commit -m "Opdatering" / git push.
 
@@ -52,10 +51,10 @@ Tip: Skjul panelet (pilen) under skærmdeling, og læs selv opgaven højt.
 |---|---|---|---|
 | T1 | Borger | Find ud af, hvor mange mandater Hørsholm Kommune fik ved Kommunalvalg 2025, og hvilket parti der fik flest. | 19 mandater. Parti C (Konservative) fik flest (6). |
 | T2 | Journalist/analytiker | Sammenlign mandatfordelingen i Hørsholm og Ishøj, og hent tallene, så du kan åbne dem i et regneark. | Sammenligningssiden Hørsholm vs. Ishøj og en downloadet fil. |
-| T3 | Kommunal medarbejder | Du arbejder i en kommune. Find vejledning til, hvordan resultatet indberettes efter optælling. | Artiklen "Optælling og indberetning". |
-| T4 | Borger/analytiker | Find ud af, hvilket parti der fik flest mandater i Ishøj, og om partiet fik flere eller færre end ved valget i 2021. | A (Socialdemokratiet), 9 mandater, ét færre end 2021. |
+| T3 | Borger/analytiker | Find ud af, hvilket parti der fik flest mandater i Ishøj, og om partiet fik flere eller færre end ved valget i 2021. | A (Socialdemokratiet), 9 mandater, ét færre end 2021. |
+| T4 | Journalist/analytiker | Hent valgtal fra alle kommuner i Region Hovedstaden til et regneark. | Hent data > Udvalgte regioner > Region Hovedstaden, 29 kommuner, download. |
 
-Forslag til succeskriterier: T1 inden for 30 sekunder uden hjælp; T2 når eksport uden hjælp; T3 inden for 3 klik; T4 inden for 60 sekunder. Brug 3–5 deltagere pr. brugergruppe.
+Forslag til succeskriterier: T1 inden for 30 sekunder uden hjælp; T2 når eksport uden hjælp; T3 inden for 60 sekunder. Brug 3–5 deltagere pr. brugergruppe.
 
 ## Hvordan prototypen hænger sammen med opgaven
 
@@ -80,7 +79,7 @@ Forslag til succeskriterier: T1 inden for 30 sekunder uden hjælp; T2 når ekspo
 
 ## Begrænsninger
 
-- Vejledningstekster, opdateringer og seneste sammenligninger er opdigtede til prototypen.
+- Opdateringer og seneste sammenligninger er opdigtede til prototypen.
 - Søgning på parti og kandidat er ikke bygget (ender i blindgyde). Det er en bevidst afgrænsning.
 - Kun en delmængde af valgtyper er med (se accordion på forsiden).
 

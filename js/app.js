@@ -52,7 +52,6 @@
     pin: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
     compare: '<path d="M4 7h13l-3-3M20 17H7l3 3"/>',
     download: '<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
-    book: '<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5zM18 19v2H6"/>',
   };
   const icon = n => h('span', { class: 'ic', 'aria-hidden': 'true', html: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[n]}</svg>` });
   const crumb = (...items) => h('nav', { class: 'crumb', 'aria-label': 'Brødkrumme' }, items.map((it, i) => [i ? '  ›  ' : '', it.href ? h('a', { href: it.href }, it.t) : it.t]));
@@ -218,7 +217,7 @@
       h('div', { class: 'box' }, inp, h('button', { class: 'btn', type: 'submit' }, 'Søg')),
       h('p', { class: 'hint' }, 'Fx København, Region Hovedstaden eller Kommunalvalg 2025'));
     el.append(h('div', { class: 'hero' }, h('div', {}, h('p', { class: 'eyebrow' }, 'Officielle valgresultater i Danmark'), h('h1', {}, 'Velkommen til valg.dk'),
-      h('p', { class: 'lead' }, 'Find resultater, sammenlign tal og få vejledning – uanset hvilket valg det handler om.'), h('div', { style: 'margin-top:28px;max-width:640px' }, form))));
+      h('p', { class: 'lead' }, 'Find resultater, sammenlign tal og hent data – uanset hvilket valg det handler om.'), h('div', { style: 'margin-top:28px;max-width:640px' }, form))));
     autocomplete(inp, searchAll, pickSearch);
 
     const card = (hr, ic, t, p) => h('a', { class: 'card', href: hr }, icon(ic), h('h3', {}, t), h('p', {}, p), h('span', { class: 'chev', 'aria-hidden': 'true' }, '›'));
@@ -226,8 +225,7 @@
       h('div', { class: 'cards' },
         card('#/find', 'pin', 'Find resultatet for din kommune', 'Se hvordan der blev stemt hos dig'),
         card('#/sammenlign', 'compare', 'Sammenlign områder', 'Sæt 2–3 kommuner eller regioner side om side i et diagram'),
-        card('#/data', 'download', 'Hent data', 'Træk tal for hele landet, regioner eller udvalgte kommuner'),
-        card('#/vejledning', 'book', 'Få vejledning til valgarbejdet', 'Procedurer og praktisk information'))));
+        card('#/data', 'download', 'Hent data', 'Træk tal for hele landet, regioner eller udvalgte kommuner'))));
 
     const land = getArea('land'), L = land.results[DEFAULT_VALG], L0 = land.results[ELS[DEFAULT_VALG].prev];
     const sel = h('select', { class: 'select', id: 'pickK', 'aria-label': 'Vælg kommune' }, h('option', { value: '' }, 'Vælg kommune …'), KOM.map(k => h('option', { value: k.id }, k.name)));
@@ -653,58 +651,6 @@
   }
 
 
-  /* ---------- vejledning (kommunal medarbejder) ---------- */
-  const ART = {
-    foer: { t: 'Før valget', d: 'Kandidatlister, frister og forberedelse', lead: 'Overblik over opgaver og frister, inden valget udskrives.', steps: [['Planlæg valgforløbet', 'Fastlæg tidsplan, ansvarlige og vigtige frister i kommunen.'], ['Kontrollér valgsteder', 'Bekræft adresser, åbningstider og tilgængelighed for alle valgsteder.'], ['Gør VALG-løsningen klar', 'Tjek brugeradgang og roller for medarbejdere, der skal registrere eller godkende.'], ['Informér borgerne', 'Offentliggør information om valgsteder, brevstemme og frister.']] },
-    valgdagen: { t: 'Valgdagen', d: 'Valgsteder, afstemning og opgaver', lead: 'Praktiske opgaver på selve valgdagen.', steps: [['Åbn valgstedet', 'Kontrollér materiale, stemmebokse og valgliste.'], ['Gennemfør afstemningen', 'Følg retningslinjerne for identifikation og stemmeafgivelse.'], ['Luk valgstedet', 'Afslut afstemningen på det fastsatte tidspunkt, og sikr materialet.']] },
-    optaelling: { t: 'Optælling og indberetning', d: 'Sådan tæller og melder du resultater', lead: 'Trin-for-trin gennem optælling og indberetning, så resultatet vises korrekt for borgerne.', steps: [['Gør klar til optælling', 'Kontrollér, at alle valgsteder har afleveret afstemningsmateriale.'], ['Tæl stemmerne op', 'Optælling foregår i henhold til retningslinjerne for valgstedet.'], ['Indberet foreløbigt resultat', 'Indtast tallene i VALG-løsningen, og kontrollér mod valgstedets protokol.'], ['Godkend og offentliggør', 'Når resultatet er godkendt, vises det automatisk på valg.dk.'], ['Afslut og arkivér', 'Gem dokumentation, og luk valgstedet i systemet.']] },
-    efter: { t: 'Efter valget', d: 'Offentliggørelse og afslutning', lead: 'Opgaver, når resultatet er endeligt.', steps: [['Kontrollér det endelige resultat', 'Sammenhold indberetninger med protokollerne.'], ['Offentliggør resultatet', 'Resultatet publiceres på valg.dk, når det er godkendt.'], ['Afslut valget', 'Arkivér materiale og luk valget i systemet.']] },
-  };
-  function vejledning(parts, q) {
-    if (parts[1] && ART[parts[1]]) return artikel(parts[1]);
-    document.title = 'Vejledning – valg.dk (prototype)';
-    const inp = h('input', { type: 'text', id: 'gq', placeholder: 'Søg i vejledninger …', 'aria-label': 'Søg i vejledninger' });
-    const cards = h('div', { class: 'guide-grid' });
-    const upd = [['Ny vejledning: offentliggørelse af foreløbige resultater', '12. okt. 2026', 'efter'], ['Opdateret: tidsplan for valgaftenen', '8. okt. 2026', 'valgdagen'], ['Ny FAQ: hvad gør jeg ved fejl i indberetningen?', '1. okt. 2026', 'optaelling']];
-    const none = h('p', { class: 'panel', hidden: true, role: 'status' }, 'Ingen vejledninger matcher din søgning.');
-    function draw() {
-      const n = inp.value.toLowerCase().trim();
-      const hit = Object.entries(ART).filter(([, a]) => !n || (a.t + ' ' + a.d + ' ' + a.steps.flat().join(' ')).toLowerCase().includes(n));
-      cards.innerHTML = '';
-      hit.forEach(([id, a]) => cards.append(h('a', { class: 'card', href: href('/vejledning/' + id) }, icon('book'), h('h3', {}, a.t), h('p', {}, a.d), h('span', { class: 'chev', 'aria-hidden': 'true' }, '›'))));
-      none.hidden = hit.length > 0;
-    }
-    inp.addEventListener('input', () => { draw(); log('search', inp.value); });
-    draw();
-    return h('div', { class: 'page wrap' }, crumb({ t: 'Forside', href: '#/' }, { t: 'Hjælp' }, { t: 'Vejledning' }),
-      h('h1', {}, 'Vejledning til valgarbejdet'), h('p', { class: 'lead' }, 'Praktisk information og procedurer til dig, der arbejder med valg i en kommune.'),
-      h('form', { class: 'search', style: 'margin-top:26px', role: 'search', onsubmit: e => e.preventDefault() }, h('div', { class: 'box' }, inp, h('button', { class: 'btn', type: 'submit' }, 'Søg'))),
-      cards, none,
-      h('section', { class: 'section', 'aria-labelledby': 'h-upd' }, h('h2', { id: 'h-upd' }, 'Seneste opdateringer'), h('div', { class: 'list' }, upd.map(u => h('a', { href: href('/vejledning/' + u[2]) }, h('strong', {}, u[0]), h('small', {}, u[1]))))),
-      h('section', { class: 'panel tint section cta', 'aria-labelledby': 'h-help' }, h('div', {}, h('h2', { id: 'h-help', style: 'font-size:22px' }, 'Brug for hjælp?'), h('p', { style: 'color:var(--muted);margin-top:6px' }, 'Kontakt valg-supporten, hvis du ikke kan finde svaret.')),
-        h('a', { class: 'btn secondary', href: href('/ikke-med', { side: 'Kontakt support' }) }, 'Kontakt support')));
-  }
-  function artikel(id) {
-    const a = ART[id]; document.title = `${a.t} – vejledning – valg.dk (prototype)`;
-    const done = new Set(); const prog = h('i'); const pt = h('small', { style: 'color:var(--muted)' });
-    const upd = () => { prog.style.width = (done.size / a.steps.length * 100) + '%'; pt.textContent = `${done.size} af ${a.steps.length} trin gennemført`; };
-    const cards = a.steps.map((st, i) => {
-      const cb = h('input', { type: 'checkbox', id: 'cb' + i });
-      const card = h('div', { class: 'step-card', id: 'step' + i }, h('div', { class: 'no', 'aria-hidden': 'true' }, String(i + 1)), h('div', {}, h('h3', {}, st[0]), h('p', {}, st[1]), h('label', { for: 'cb' + i }, cb, 'Markér som gennemført')));
-      cb.addEventListener('change', () => { card.classList.toggle('done', cb.checked); cb.checked ? done.add(i) : done.delete(i); upd(); });
-      return card;
-    });
-    upd();
-    return h('div', { class: 'page wrap' }, crumb({ t: 'Forside', href: '#/' }, { t: 'Hjælp' }, { t: 'Vejledning', href: '#/vejledning' }, { t: a.t }),
-      h('h1', { style: 'max-width:820px' }, a.t), h('p', { class: 'lead' }, a.lead),
-      h('div', { class: 'article' }, h('div', {}, cards, h('p', { class: 'source' }, 'Eksempeltekst til prototypen – ikke officiel vejledning.')),
-        h('aside', { class: 'aside' },
-          h('nav', { class: 'panel', 'aria-label': 'På denne side' }, h('h3', { style: 'margin-bottom:10px' }, 'På denne side'), a.steps.map((st, i) => h('a', { href: '#', onclick: e => { e.preventDefault(); document.getElementById('step' + i).scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, `${i + 1}. ${st[0]}`))),
-          h('div', { class: 'panel' }, h('h3', {}, 'Din fremdrift'), h('div', { class: 'progress' }, prog), pt),
-          h('div', { class: 'panel tint' }, h('h3', { style: 'margin-bottom:12px' }, 'Se hvordan resultatet vises for borgerne'), h('a', { class: 'btn secondary small', href: href('/resultat/horsholm', { valg: DEFAULT_VALG }) }, 'Åbn kommuneresultat')),
-          h('div', { class: 'panel' }, h('h3', {}, 'Brug for hjælp?'), h('p', { style: 'color:var(--muted);margin:6px 0 12px' }, 'Kontakt valg-supporten.'), h('a', { class: 'btn secondary small', href: href('/ikke-med', { side: 'Kontakt support' }) }, 'Kontakt')))));
-  }
-
   /* ---------- blindgyde ---------- */
   function ikkeMed(parts, q) {
     const side = q.side || 'Denne side';
@@ -725,7 +671,7 @@
       h('p', { class: 'protonote', role: 'note' }, PG.notice), h('div', { class: 'prose' }, body));
   }
   const omValg = () => docPage(PG.om.title, blocks(PG.om.paras),
-    h('h2', {}, 'Genveje'), h('ul', {}, [['#/driftstatus', 'Driftstatus for valg.dk'], ['#/tilgaengelighed', 'Tilgængelighedserklæring'], ['#/privatliv', 'Privatlivspolitik og brug af data'], ['#/data', 'Eksport af data'], ['#/vejledning', 'Vejledning til valgarbejdet']].map(([hr, t]) => h('li', {}, h('a', { href: hr }, t)))));
+    h('h2', {}, 'Genveje'), h('ul', {}, [['#/driftstatus', 'Driftstatus for valg.dk'], ['#/tilgaengelighed', 'Tilgængelighedserklæring'], ['#/privatliv', 'Privatlivspolitik og brug af data'], ['#/data', 'Eksport af data']].map(([hr, t]) => h('li', {}, h('a', { href: hr }, t)))));
   const secs = sections => sections.map(([hd, body]) => [hd ? h('h2', {}, hd) : null, blocks(body)]);
   const tilgPage = () => docPage(PG.tilg.title, secs(PG.tilg.sections));
   const privPage = () => docPage(PG.priv.title, secs(PG.priv.sections));
@@ -740,13 +686,12 @@
     return docPage('Sitemap',
       sec('Valgresultater', [['#/find', 'Find resultat'], [resultHref('land', 'kv2025'), 'Hele landet – Kommunalvalg 2025'], [resultHref('land', 'kv2021'), 'Hele landet – Kommunalvalg 2021']].concat(REG.map(r => [resultHref(r.id, 'kv2025'), r.name]))),
       sec('Tal og data', [['#/sammenlign', 'Sammenlign områder'], ['#/data', 'Hent data']]),
-      sec('Vejledning', [['#/vejledning', 'Vejledning til valgarbejdet']].concat(Object.entries(ART).map(([id, a]) => ['#/vejledning/' + id, a.t]))),
       sec('Om valg.dk', [['#/om-valg', 'Om valg.dk'], ['#/driftstatus', 'Driftstatus for valg.dk'], ['#/tilgaengelighed', 'Tilgængelighedserklæring'], ['#/privatliv', 'Privatlivspolitik og brug af data']]));
   }
 
 
   /* ---------- router ---------- */
-  const routes = { '': home, find, resultat, sammenlign, data: dataPage, vejledning, 'om-valg': omValg, driftstatus: driftPage, tilgaengelighed: tilgPage, privatliv: privPage, sitemap: sitemapPage, 'ikke-med': ikkeMed };
+  const routes = { '': home, find, resultat, sammenlign, data: dataPage, 'om-valg': omValg, driftstatus: driftPage, tilgaengelighed: tilgPage, privatliv: privPage, sitemap: sitemapPage, 'ikke-med': ikkeMed };
   const NAVKEY = { resultat: 'find' };
   function render() {
     const { parts, q } = parse();

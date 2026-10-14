@@ -89,7 +89,7 @@ label.pill input:disabled+span{opacity:.45;cursor:not-allowed}
 .hero .map{width:100%;max-width:300px;justify-self:end;opacity:.95}
 
 /* cards */
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .card{display:flex;flex-direction:column;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:24px;text-decoration:none;color:var(--ink);position:relative;box-shadow:var(--shadow);transition:transform .18s,border-color .18s,box-shadow .18s}
 .card:hover{transform:translateY(-3px);border-color:var(--primary);color:var(--ink);box-shadow:0 10px 24px rgba(15,28,46,.12)}
 .card .ic{width:44px;height:44px;border-radius:50%;background:var(--soft);display:grid;place-items:center;margin-bottom:10px;color:var(--primary)}
@@ -191,20 +191,10 @@ table.tbl{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:17p
 .chart-legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:8px;vertical-align:-2px}
 
 /* guide */
-.guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:28px}
 .list{display:flex;flex-direction:column;gap:12px}
 .list a,.list div.item{display:flex;justify-content:space-between;gap:16px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:18px 24px;text-decoration:none;color:var(--ink)}
 .list a:hover{border-color:var(--primary)}
 .list small{color:var(--muted);white-space:nowrap}
-.article{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;margin-top:28px;align-items:start}
-.step-card{display:flex;gap:20px;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:22px 26px;margin-bottom:16px;transition:background .2s,border-color .2s}
-.step-card.done{background:var(--tint);border-color:#CFE5D3}
-.step-card .no{flex:none;width:46px;height:46px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;font-size:20px}
-.step-card.done .no{background:var(--green)}
-.step-card h3{margin-bottom:6px}
-.step-card p{color:var(--muted)}
-.step-card label{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:15px;font-weight:600;cursor:pointer}
-.step-card input{width:20px;height:20px}
 .aside{display:flex;flex-direction:column;gap:20px;position:sticky;top:20px}
 .aside nav a{display:block;padding:6px 0;text-decoration:none}
 .progress{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin:10px 0 4px}
