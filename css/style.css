@@ -260,7 +260,7 @@ table.tbl{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:17p
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 @media print{
-  .proto-banner,.site-header,.site-footer,#testpanel,.toolbar,.btn,.cta{display:none!important}
+  .proto-banner,.site-header,.site-footer,#testpanel,.toolbar,.btn,.cta,.noprint,.seg{display:none!important}
   body{background:#fff}.page{animation:none}
 }
 @media (max-width:1000px){.findgrid{grid-template-columns:1fr !important}}
@@ -365,3 +365,6 @@ main:focus,main:focus-visible{outline:none}
 #testpanel a.tb{font:inherit;font-size:13px;font-weight:600;border-radius:6px;border:1.5px solid var(--primary);background:#fff;color:var(--primary);padding:5px 10px;text-decoration:none}
 #testpanel button.tb:disabled{opacity:.45;cursor:not-allowed}
 #testpanel .seq{display:flex;gap:4px;flex-wrap:wrap}
+
+.plink{color:inherit;text-decoration:none;font-weight:600}.plink:hover{text-decoration:underline;color:var(--primary)}
+.dkmap,.chart svg{max-width:100%}

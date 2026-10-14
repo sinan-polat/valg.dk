@@ -12,6 +12,7 @@ Hvad kan prototypen?
 | Resultat | #/resultat/horsholm, #/resultat/region-hovedstaden, #/resultat/land | Mandater, sortering, ændring, kort og kommuneliste for regioner/landet, download |
 | Sammenlign | #/sammenlign | 2–3 områder (kommuner, regioner, hele landet) i diagram eller tabel |
 | Hent data | #/data | Guide i 4 trin: nøgletal/parti, hele landet/regioner/kommuner, valg, format. Forhåndsvisning og download |
+| Parti | #/parti/V | Søg på partinavn eller bogstav (forslag på forsiden). Landstal, ændring og alle kommuner sorteret efter andel/mandater, download. Kandidatsøgning er ikke med (ender i blindgyde). |
 | Faste sider | #/om-valg, #/driftstatus, #/tilgaengelighed, #/privatliv, #/sitemap | Tekst gengivet fra officielle valg.dk (gælder ikke prototypen) |
 
 Kortet er skematisk (ikke et officielt kort); kommunernes placering er omtrentlig, og cirklens areal viser antal valgberettigede, så København ikke ser lille ud. Alle tal er eksempeldata.
@@ -109,3 +110,6 @@ js/test-mode.js       testpanel (kun med ?test=1)
 tools/generate_data.py  genererer eksempeldata
 .nojekyll             så GitHub Pages serverer filerne uændret
 ```
+
+## Del, udskriv og gem som billede
+Resultat, sammenligning, parti og Hent data har knapperne Kopiér link (adressen uden testparametre) og Udskriv (printvenlig, uden menuer og knapper). Sammenligningsdiagrammet og kortene kan gemmes som PNG med titel, signaturforklaring og kildelinje.
