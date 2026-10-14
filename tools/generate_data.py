@@ -122,6 +122,43 @@ def make_result(name, valg, seats, electorate, fixed):
     }
 
 
+AREA_WORDS = ["Nord", "Syd", "Øst", "Vest", "Midt", "Centrum", "Skovvejen", "Havnen", "Skolen", "Hallen", "Kirken", "Parken", "Bakken", "Engen", "Mosen", "Stranden", "Torvet", "Banen", "Åen", "Bykernen", "Lunden", "Højen", "Vænget", "Toften", "Dalen"]
+
+
+def alloc(total, weights):
+    """Fordel et heltal i forhold til vægte, så summen er præcis (største rest)."""
+    s = sum(weights)
+    raw = [total * w / s for w in weights]
+    out = [int(x) for x in raw]
+    for i in sorted(range(len(raw)), key=lambda i: raw[i] - out[i], reverse=True)[: total - sum(out)]:
+        out[i] += 1
+    return out
+
+
+def make_areas(name, valg, res, n):
+    """Eksempeldata på afstemningsområde-niveau. Summer af stemmer pr. parti = kommunens tal."""
+    r = rng(name, valg, "areas")
+    names = rng(name, "areanames").sample(AREA_WORDS, n)
+    w = [r.uniform(0.6, 1.5) for _ in range(n)]
+    votes = {i: {} for i in range(n)}
+    for p, tot in res["votes"].items():
+        sh = [wi * math.exp(r.gauss(0, 0.12)) for wi in w]
+        for i, v in enumerate(alloc(tot, sh)):
+            if v > 0:
+                votes[i][p] = v
+    valid = [sum(votes[i].values()) for i in range(n)]
+    blanks = alloc(res["cast"] - res["valid"], valid)
+    cast = [valid[i] + blanks[i] for i in range(n)]
+    elec = alloc(res["electorate"], [cast[i] / (res["turnout"] / 100) * math.exp(r.gauss(0, 0.04)) for i in range(n)])
+    for i in range(n):  # sikr afgivne <= valgberettigede
+        if cast[i] > elec[i]:
+            j = max(range(n), key=lambda x: elec[x] - cast[x])
+            d = cast[i] - elec[i] + 1
+            elec[i] += d
+            elec[j] -= d
+    return [{"id": "o%d" % (i + 1), "name": f"{name} {names[i]}", "electorate": elec[i], "cast": cast[i], "valid": valid[i], "votes": votes[i]} for i in range(n)]
+
+
 def main():
     komm = []
     for region, names in REGIONS.items():
@@ -138,9 +175,11 @@ def main():
                 seats = r.choice([25, 27, 29, 31]) if r.random() < 0.55 else r.choice([19, 21, 23, 25])
                 electorate = r.randint(9000, 65000)
             results = {}
+            narea = max(2, min(25, round(electorate / 6000)))
             for valg in ("kv2025", "kv2021"):
                 fixed = FIXED.get(n, {}).get(valg)
                 results[valg] = make_result(n, valg, seats, round(electorate * (1.0 if valg == "kv2025" else 0.985)), fixed)
+                results[valg]["areas"] = make_areas(n, valg, results[valg], narea)
             komm.append({"id": slug(n), "name": n, "region": region, "seats": seats, "lat": COORDS[n][0], "lon": COORDS[n][1], "results": results})
     komm.sort(key=lambda k: k["name"].replace("Aa", "Å").replace("Æ", "Zæ").replace("Ø", "Zø").replace("Å", "Zå"))
     data = {

@@ -59,7 +59,7 @@
     svg.append(defs);
     const regG = {};
     REGIONS.forEach(r => {
-      const g = el('g', { class: 'reg' + (zoom && zoom !== r.id ? ' dim' : ''), 'data-region': r.id, fill: r.tint, stroke: '#fff', 'stroke-width': '1.2', 'stroke-linejoin': 'round' });
+      const g = el('g', { class: 'reg' + (zoom && zoom !== r.id ? ' dim' : ''), 'data-region': r.id, fill: opts.plain ? '#E4EEE7' : r.tint, stroke: '#fff', 'stroke-width': '1.2', 'stroke-linejoin': 'round' });
       g.append(el('title', {}, r.name));
       regG[r.id] = g; svg.append(g);
     });
@@ -67,7 +67,7 @@
     regG['region-midtjylland'].append(el('path', { d: d(JUT), 'clip-path': `url(#${id}m)` }));
     regG['region-syddanmark'].append(el('path', { d: d(JUT), 'clip-path': `url(#${id}s)` }));
     regG['region-sjaelland'].append(el('path', { d: d(ZEA) }));
-    regG['region-hovedstaden'].append(el('path', { d: d(ZEA), 'clip-path': `url(#${id}h)`, fill: REGIONS[4].tint }));
+    regG['region-hovedstaden'].append(el('path', { d: d(ZEA), 'clip-path': `url(#${id}h)`, fill: opts.plain ? '#E4EEE7' : REGIONS[4].tint }));
     for (const rid in ISLANDS) ISLANDS[rid].forEach(poly => regG[rid].append(el('path', { d: d(poly) })));
     if (opts.onRegion) Object.entries(regG).forEach(([rid, g]) => { g.style.cursor = 'pointer'; g.addEventListener('click', () => opts.onRegion(rid)); });
     const items = D.kommuner.slice().sort((a, b) => b.results[valg].electorate - a.results[valg].electorate);
@@ -75,7 +75,7 @@
     const gC = el('g', { class: 'bubbles' });
     items.forEach(k => {
       const R = k.results[valg], [cx, cy] = P(k.lat, k.lon), r = Math.max(2.3 * rs, Math.sqrt(R.electorate) * kcirc);
-      const fill = metric === 'party' ? D.parties[biggest(k, valg)].color : RAMP[binOf(R.turnout, edges)];
+      const fill = metric === 'status' ? '#2E9C58' : metric === 'party' ? D.parties[biggest(k, valg)].color : RAMP[binOf(R.turnout, edges)];
       const dim = zoom && regionId(k) !== zoom;
       const c = el('circle', { cx: cx.toFixed(1), cy: cy.toFixed(1), r: r.toFixed(1), fill, 'fill-opacity': dim ? '.25' : '.9', stroke: '#fff', 'stroke-width': '0.8', class: 'bub', 'data-id': k.id });
       const big = biggest(k, valg);
@@ -84,7 +84,7 @@
       gC.append(c);
     });
     svg.append(gC);
-    if (!zoom) REGIONS.forEach(r => { const [x, y] = P(r.label[0], r.label[1]); svg.append(el('text', { x, y, 'text-anchor': 'middle', class: 'rlabel' }, r.short)); });
+    if (!zoom && !opts.plain) REGIONS.forEach(r => { const [x, y] = P(r.label[0], r.label[1]); svg.append(el('text', { x, y, 'text-anchor': 'middle', class: 'rlabel' }, r.short)); });
     if (zoom) {
       const ks = D.kommuner.filter(k => regionId(k) === zoom && !(zoom === 'region-hovedstaden' && k.name === 'Bornholm')).map(k => P(k.lat, k.lon));
       const xs = ks.map(p => p[0]), ys = ks.map(p => p[1]), pad = 34;
@@ -100,7 +100,11 @@
     scale = scale || 1;
     const wrap = document.createElement('div'); wrap.className = 'maplegend';
     const edges = bins(valg), f = x => x.toLocaleString('da-DK', { minimumFractionDigits: 1 });
-    if (metric === 'turnout') {
+    if (metric === 'status') {
+      const l = document.createElement('div'); l.className = 'lg-col';
+      l.innerHTML = '<strong>Status på optælling</strong><span><i style="background:#2E9C58"></i>Optælling afsluttet</span>';
+      wrap.append(l);
+    } else if (metric === 'turnout') {
       const rows = [`under ${f(edges[0])} %`, `${f(edges[0])}–${f(edges[1])} %`, `${f(edges[1])}–${f(edges[2])} %`, `${f(edges[2])}–${f(edges[3])} %`, `${f(edges[3])} % og over`];
       const l = document.createElement('div'); l.className = 'lg-col';
       l.innerHTML = '<strong>Valgdeltagelse</strong>' + rows.map((t, i) => `<span><i style="background:${RAMP[i]}"></i>${t}</span>`).join('');

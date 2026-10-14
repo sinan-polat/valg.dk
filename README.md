@@ -12,6 +12,7 @@ Hvad kan prototypen?
 | Resultat | #/resultat/horsholm, #/resultat/region-hovedstaden, #/resultat/land | Mandater, sortering, ændring, kort og kommuneliste for regioner/landet, download |
 | Sammenlign | #/sammenlign | 2–3 områder (kommuner, regioner, hele landet) i diagram eller tabel |
 | Hent data | #/data | Guide i 4 trin: nøgletal/parti, hele landet/regioner/kommuner, valg, format. Forhåndsvisning og download |
+| Afstemningsområde | #/resultat/horsholm/o1 | Stemmer pr. parti på afstemningsområde-niveau (eksempeldata, fiktive navne), ændring ift. forrige valg, download. Mandater vises kun på kommuneniveau. |
 | Parti | #/parti/V | Søg på partinavn eller bogstav (forslag på forsiden). Landstal, ændring og alle kommuner sorteret efter andel/mandater, download. Kandidatsøgning er ikke med (ender i blindgyde). |
 | Faste sider | #/om-valg, #/driftstatus, #/tilgaengelighed, #/privatliv, #/sitemap | Tekst gengivet fra officielle valg.dk (gælder ikke prototypen) |
 
@@ -52,7 +53,7 @@ Prototypen har to versioner med samme data, samme sider og samme opgaver:
 
 | Version | Adresse (send til deltageren) | Struktur |
 |---|---|---|
-| A – nuværende struktur | `https://sinan-polat.github.io/valg.dk/?v=a` | Valgtype først: forside med valgtyper, derefter valg, derefter område. Sammenlign og Eksport ligger kun under det enkelte valg (og Eksport i footeren). Intet kort. |
+| A – nuværende struktur | `https://sinan-polat.github.io/valg.dk/?v=a` | Som den nuværende side: forside med status på optælling og Danmarkskort (klik på kommune), derefter kommune og afstemningsområde. Valgtyper som liste. Sammenlign og Eksport ligger kun under det enkelte valg (og Eksport i footeren). Ingen opgavekort, regioner eller Hent data i menuen. |
 | B – opgavebaseret | `https://sinan-polat.github.io/valg.dk/?v=b` (standard) | Opgavekort, kort over Danmark og regioner, Sammenlign og Hent data i hovedmenuen |
 
 Versionen huskes i browserfanen. Del deltagerne ligeligt (fx P01, P03 … får A, P02, P04 … får B), og lad dem løse de samme opgaver. Facilitatoren åbner med `?test=1&v=a` eller `&v=b` og kan også skifte version i testpanelet.
@@ -113,3 +114,6 @@ tools/generate_data.py  genererer eksempeldata
 
 ## Del, udskriv og gem som billede
 Resultat, sammenligning, parti og Hent data har knapperne Kopiér link (adressen uden testparametre) og Udskriv (printvenlig, uden menuer og knapper). Sammenligningsdiagrammet og kortene kan gemmes som PNG med titel, signaturforklaring og kildelinje.
+
+## Stemmeændringer og afstemningsområder
+Partitabellerne viser nu ændring i stemmeandel (%-point) og i antal stemmer ift. forrige valg, ud over ændring i mandater. Hver kommune har afstemningsområder (fiktive navne og tal, summerer til kommunens tal), og Hent data kan hente data pr. afstemningsområde.
