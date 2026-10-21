@@ -1,0 +1,16 @@
+GLØD brandpakke
+================
+logo/      Logo, ordmærke og GLØD-elementet som SVG (web), PDF (tryk, vektor) og PNG (gennemsigtig).
+           "-lys" = til mørk baggrund. qr-booking.svg = QR-kode til online booking.
+tryk/      GLOD-A5-flyer-tryk.pdf      A5, 2 sider, 154x216 mm inkl. 3 mm beskæring
+           GLOD-rollup-85x200-tryk.pdf 85x200 cm, 856x2006 mm inkl. 3 mm beskæring
+web/       Hjemmesiden:
+             index.html        indhold og struktur
+             css/style.css     al styling
+             js/main.js        faner, guide, booking-knap og GSAP-animationer
+             img/fotos/        stockfotos (tom indtil du kører hent-billeder.bat)
+             img/FOTOS.txt     liste over fotos og links til Unsplash
+           FOTOS: Dobbeltklik på web/hent-billeder.bat (Windows). Den henter de 16 fotos ned i img/fotos.
+           Indtil da henter siden automatisk de samme billeder direkte fra Unsplash, så den virker begge veje.
+           Fotos er fra Unsplash (gratis til kommerciel brug). Udskift dem med klinikkens egne fotos med samme filnavn.
+skrifter/  Cormorant Garamond og Jost (SIL Open Font License, gratis til kommerciel brug).
